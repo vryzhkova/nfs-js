@@ -1,7 +1,17 @@
+const MAX_ENEMY = 7;
+
 const score = document.querySelector('.score');
 const start = document.querySelector('.start');
 const gameArea = document.querySelector('.gameArea');
 const car = document.createElement('div');
+
+// const music = document.createElement('embed');
+// music.src = 'audio.mp3';
+
+// music.classList.add('visually-hidden');
+
+const music = new Audio('audio.mp3');
+console.log(music);
 
 car.classList.add('car');
 
@@ -20,16 +30,25 @@ const setting = {
     start: false,
     score: 0,
     speed: 3,
-    traffic: 3,
+    traffic: 2.5,
 }
 
 function getQuantityElements(heightElement) {
     return document.documentElement.clientHeight / heightElement + 1;
 }
 
-console.log(getQuantityElements(20));
+const getRandomEnemy = (max) => Math.floor((Math.random() * max) + 1);
 
 function startGame() {
+    // document.body.append(music);
+    
+    // setTimeout(() => {
+    //     music.remove()
+    // }, 3000)
+    music.play();
+
+    gameArea.style.minHeight = 700 + 'px';
+
     start.classList.add('hide');
 
     for (let i = 0; i < getQuantityElements(100); i++) {
@@ -46,7 +65,7 @@ function startGame() {
         enemy.y = -100 * setting.traffic * (i + 1);
         enemy.style.left = Math.floor((Math.random() * (gameArea.offsetWidth - 50))) + 'px';
         enemy.style.top = enemy.y + 'px;'
-        enemy.style.background = 'transparent url(./image/enemy2.png) center / cover no-repeat';
+        enemy.style.background = `transparent url(./image/enemy${getRandomEnemy(MAX_ENEMY)}.png) center / cover no-repeat`;
         gameArea.appendChild(enemy);
     }
 
@@ -87,13 +106,17 @@ function playGame() {
 };
 
 function startRun(event) {
-    event.preventDefault();
-    keys[event.key] = true;
+    if (keys.hasOwnProperty(event.key)) {
+        event.preventDefault();
+        keys[event.key] = true;
+    }
 };
 
 function stopRun(event) {
+    if (keys.hasOwnProperty(event.key)) {
     event.preventDefault();
     keys[event.key] = false;
+    }
 };
 
 function moveRoad() {
@@ -120,6 +143,8 @@ function moveEnemy () {
             item.style.left = Math.floor((Math.random() * (gameArea.offsetWidth - 50))) + 'px';
         }
     });
-
-    
 }
+
+setTimeout(() => {
+    music.remove()
+}, 3000)
