@@ -11,7 +11,6 @@ const car = document.createElement('div');
 // music.classList.add('visually-hidden');
 
 const music = new Audio('audio.mp3');
-console.log(music);
 
 car.classList.add('car');
 
@@ -47,7 +46,9 @@ function startGame() {
     // }, 3000)
     music.play();
 
-    gameArea.style.minHeight = 700 + 'px';
+    // gameArea.style.minHeight = 700 + 'px';
+
+    gameArea.innerHTML = '';
 
     start.classList.add('hide');
 
@@ -64,13 +65,17 @@ function startGame() {
         enemy.classList.add('enemy');
         enemy.y = -100 * setting.traffic * (i + 1);
         enemy.style.left = Math.floor((Math.random() * (gameArea.offsetWidth - 50))) + 'px';
-        enemy.style.top = enemy.y + 'px;'
+        enemy.style.top = enemy.y + 'px';
         enemy.style.background = `transparent url(./image/enemy${getRandomEnemy(MAX_ENEMY)}.png) center / cover no-repeat`;
         gameArea.appendChild(enemy);
     }
 
+    setting.score = 0;
     setting.start = true;
     gameArea.appendChild(car);
+    car.style.left = gameArea.offsetWidth/2 - car.offsetWidth/2;
+    car.style.top = 'auto';
+    car.style.bottom = '10px';
     setting.x = car.offsetLeft;
     setting.y = car.offsetTop;
     requestAnimationFrame(playGame);
@@ -79,6 +84,8 @@ function startGame() {
 function playGame() {
     
     if (setting.start) {
+        setting.score += setting.speed;
+        score.innerHTML = 'SCORE<br>' + setting.score;
         moveRoad();
         moveEnemy();
         if (keys.ArrowLeft && setting.x > 0) {
@@ -135,6 +142,19 @@ function moveEnemy () {
     let enemy = document.querySelectorAll('.enemy');
 
     enemy.forEach(function(item){
+        let carRect = car.getBoundingClientRect();
+        let enemyRect = item.getBoundingClientRect();
+
+        if (carRect.top <= enemyRect.bottom && 
+            carRect.right >= enemyRect.left && 
+            carRect.left <= enemyRect.right && 
+            carRect.bottom >= enemyRect.top) {
+            setting.start = false;
+            console.warn('fail');
+            start.classList.remove('hide');
+            start.style.top = score.offsetHeight;
+        }
+
         item.y += setting.speed / 2;
         item.style.top = item.y + 'px';
 
@@ -145,6 +165,8 @@ function moveEnemy () {
     });
 }
 
-setTimeout(() => {
-    music.remove()
-}, 3000)
+
+
+// setTimeout(() => {
+//     music.remove()
+// }, 3000)
